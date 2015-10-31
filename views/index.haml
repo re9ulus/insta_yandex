@@ -25,6 +25,11 @@
 						%input#coord_lon.uk-margin-small-top{type: "hidden", name: "lon", value: "#{(defined? lon) ? lon : ''}"}
 						%input#dist.uk-margin-small-top{type: "hidden", name: "dist",  value: "#{(defined? dist) ? dist : '1000'}"}
 						%button#button_photos.uk-button-large.uk-width-1-1{type: "submit"} Get photos
+				%div.uk-grid	
+					%div.uk-width-2-10
+						%button#share_button.uk-button{:type= => 'button'} Share
+					%div.uk-width-8-10
+						%div#share_link.uk-text-primary
 
 		%div#photos.uk-grid
 

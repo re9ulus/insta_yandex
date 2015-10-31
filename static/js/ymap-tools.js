@@ -1,6 +1,7 @@
 $(function() {
 	ymaps.ready(init);
 	var myMap,
+		coords,
 		sevastopolCoords = [44.616761107740274, 33.52558107767834],
 		placemarkStyle = {
 			preset: 'islands#circleIcon',
@@ -8,23 +9,29 @@ $(function() {
 		placemark;
 
 	function init() { 
+
+		coords = get_coords_from_href();
+		if (coords === null) {
+			coords = sevastopolCoords;
+		}
+
 		myMap = new ymaps.Map("map", {
-			center: sevastopolCoords,
+			center: coords,
 			zoom: 12,
 			controls: ['smallMapDefaultSet']
 		});
 
-		$('#coord_lat').val(sevastopolCoords[0]);
-		$('#coord_lon').val(sevastopolCoords[1]);
+		$('#coord_lat').val(coords[0]);
+		$('#coord_lon').val(coords[1]);
 		$('#dist').val(1000);
 
-		placemark = new ymaps.Placemark([sevastopolCoords[0], sevastopolCoords[1]], {
-			balloonContent: '' + sevastopolCoords[0] + ', ' + sevastopolCoords[1]
+		placemark = new ymaps.Placemark([coords[0], coords[1]], {
+			balloonContent: '' + coords[0] + ', ' + coords[1]
 			}, placemarkStyle);
 		myMap.geoObjects.add(placemark);
 
 		myMap.events.add('click', function (e) {
-			var coords = e.get('coords');
+			coords = e.get('coords');
 			var lat = coords[0],
 				lon = coords[1];
 			$('#coord_lat').val(lat);
@@ -68,7 +75,35 @@ $(function() {
 				},
 				dataType: 'json'
 			});
-		})
+		});
 
+		$('#share_button').click(function(e) {
+			e.preventDefault();
+			var lat = coords[0],
+				lon = coords[1];
+			var origin = window.location.origin;
+			if (typeof(origin) === 'undefined') {
+    			origin = window.location.protocol + '//' + window.location.host;
+			}
+			var link = origin + '#lat:' + lat +
+				'#lon:' + lon;
+			$('#share_link').text(link);
+		});
+	}
+
+	function get_coords_from_href() {
+		// parse link #lat:12.34#lon:45.67
+		var href = window.location.href;
+		if (href.indexOf('lat') != -1
+			&& href.indexOf('lon') != -1) {
+			var string_parts = href.split('#');
+			var lat_string = string_parts[1],
+				lon_string = string_parts[2];
+			var lat = lat_string.substring(lat_string.indexOf(':') + 1, lat_string.length),
+				lon = lon_string.substring(lon_string.indexOf(':') + 1, lon_string.length);
+			return [lat, lon];
+		} else {
+			return null;
+		}
 	}
 });
